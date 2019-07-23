@@ -41,25 +41,32 @@ def prepro_signal():
             pbar.update()
 
 def prepro_meta():
-    ## train(95%)/test(5%) split for metadata
+    ## train(90%)/eval(5%)/test(5%) split for metadata
     print('Preprocessing meta')
     # Parse
     transcript = os.path.join(args.data_path, 'metadata.csv')
     train_transcript = os.path.join(args.data_path, 'meta-train.csv')
-    test_transcript = os.path.join(args.data_path, 'meta-eval.csv')
+    eval_transcript = os.path.join(args.data_path, 'meta-eval.csv')
+    test_transcript = os.path.join(args.data_path, 'meta-test.csv')
 
     lines = codecs.open(transcript, 'r', 'utf-8').readlines()
     train_f = codecs.open(train_transcript, 'w', 'utf-8')
     test_f = codecs.open(test_transcript, 'w', 'utf-8')
+    eval_f = codecs.open(eval_transcript, 'w', 'utf-8')
 
-    test_idx = np.load('lj_eval_idx.npy')
+    eval_idx = np.load('lj_eval_idx.npy')
+    test_idx = np.load('lj_test_idx.npy')
+
 
     for idx, line in enumerate(lines):
-        if idx in test_idx:
+        if tst_idx in test_idx:
             test_f.write(line)
+        if e_idx in eval_idx:
+            eval_f.write(line)
         else:
             train_f.write(line)
-    print('# of train set: {}, # of test set: {}'.format(1+idx-len(test_idx), len(test_idx)))
+
+    print('# of train set: {}, # of eval set: {}, # of test set: {}'.format(1+idx-len(test_idx)-len(eval_idx), len(eval_idx), len(test_idx)))
     print('Complete')
 
 if __name__ == '__main__':

@@ -150,9 +150,9 @@ def save_model(model, model_infos, optimizer, scheduler, val_loss, global_step, 
 
 def main(network=1):
     if network == 1:
-        model = Text2Mel().to(DEVICE)
+        model = Text2Mel(is_test = False).to(DEVICE)
     elif network == 2:
-        model = SSRN().to(DEVICE)
+        model = SSRN(is_test=False).to(DEVICE)
     print('Model {} is working...'.format(model.name))
     print('{} threads are used...'.format(torch.get_num_threads()))
     ckpt_dir = os.path.join(args.logdir, model.name)

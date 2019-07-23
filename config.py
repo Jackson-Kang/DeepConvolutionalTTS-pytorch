@@ -1,11 +1,12 @@
 
 class ConfigArgs:
-    data_path = '/home/yangyangii/ssd/data/LJSpeech-1.1'
+    data_path = '/home/minsu/data/LJSpeech-1.1'
     mel_dir, mag_dir = 'd_mels', 'd_mags'
     ga_dir = 'guides' # guided attention
     meta = 'metadata.csv'
     meta_train = 'meta-train.csv'
     meta_eval = 'meta-eval.csv'
+    meta_test = 'meta-test.csv'
     testset = 'test_sents.txt'
     logdir = 'logs'
     sampledir = 'samples'
@@ -35,10 +36,10 @@ class ConfigArgs:
     g = 0.2
 
     batch_size = 32
-    test_batch = 50 # for test
-    max_step = 200000
+    test_batch = 32 # for test
+    max_step = 100000
     lr = 0.001
-    lr_decay_step = 50000 # actually not decayed per this step
+    lr_decay_step = 5000 # actually not decayed per this step
     Ce = 128  # for text embedding and encoding
     Cx = 256 # for text embedding and encoding
     Cy = 256 # for audio encoding

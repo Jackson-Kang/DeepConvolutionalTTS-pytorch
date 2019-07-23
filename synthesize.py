@@ -29,11 +29,21 @@ def synthesize(t2m, ssrn, data_loader, batch_size=100):
         total_mel_hats = torch.zeros([len(data_loader.dataset), args.max_Ty, args.n_mels]).to(DEVICE)
         mags = torch.zeros([len(data_loader.dataset), args.max_Ty*args.r, args.n_mags]).to(DEVICE)
         for step, (texts, _, _) in enumerate(data_loader):
+
+            count = 0
+            is_print = False
+            
+
             texts = texts.to(DEVICE)
             prev_mel_hats = torch.zeros([len(texts), args.max_Ty, args.n_mels]).to(DEVICE)
             for t in tqdm(range(args.max_Ty-1), unit='B', ncols=70):
-                mel_hats, A = t2m(texts, prev_mel_hats) # mel: (N, Ty/r, n_mels)
+                if count == args.max_Ty-2:
+                    is_print = True
+                
+                mel_hats, A = t2m(texts, prev_mel_hats, is_print = is_print)# mel: (N, Ty/r, n_mels)
                 prev_mel_hats[:, t+1, :] = mel_hats[:, t, :]
+                count += 1
+
             total_mel_hats[step*batch_size:(step+1)*batch_size, :, :] = prev_mel_hats
             
             print('='*10, ' Alignment ', '='*10)
@@ -44,9 +54,11 @@ def synthesize(t2m, ssrn, data_loader, batch_size=100):
                 utils.plot_att(alignments[idx], text, args.global_step, path=os.path.join(args.sampledir, 'A'), name='{}.png'.format(idx))
             print('='*10, ' SSRN ', '='*10)
             # Mel --> Mag
+            
             mags[step*batch_size:(step+1)*batch_size:, :, :] = \
                 ssrn(total_mel_hats[step*batch_size:(step+1)*batch_size, :, :]) # mag: (N, Ty, n_mags)
             mags = mags.cpu().detach().numpy()
+            print("iteration number", step)
         print('='*10, ' Vocoder ', '='*10)
         for idx in trange(len(mags), unit='B', ncols=70):
             wav = utils.spectrogram2wav(mags[idx])
@@ -54,12 +66,15 @@ def synthesize(t2m, ssrn, data_loader, batch_size=100):
     return None
 
 def main():
+
+    is_test = True
+
     testset = TextDataset(args.testset)
     test_loader = DataLoader(dataset=testset, batch_size=args.test_batch, drop_last=False,
                              shuffle=False, collate_fn=synth_collate_fn, pin_memory=True)
 
-    t2m = Text2Mel().to(DEVICE)
-    ssrn = SSRN().to(DEVICE)
+    t2m = Text2Mel(is_test = is_test).to(DEVICE)
+    ssrn = SSRN(is_test = is_test).to(DEVICE)
     
     ckpt = pd.read_csv(os.path.join(args.logdir, t2m.name, 'ckpt.csv'), sep=',', header=None)
     ckpt.columns = ['models', 'loss']
@@ -87,5 +102,9 @@ if __name__ == '__main__':
     gpu_id = int(sys.argv[1])
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = "{}".format(gpu_id)
-    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    #DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    DEVICE = torch.device("cpu")
+    print("possible threads: ", torch.get_num_threads())
+    #torch.set_num_threads(4)
+    
     main()
