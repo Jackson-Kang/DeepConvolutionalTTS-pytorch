@@ -59,9 +59,9 @@ def prepro_meta():
 
 
     for idx, line in enumerate(lines):
-        if tst_idx in test_idx:
+        if idx in test_idx:
             test_f.write(line)
-        if e_idx in eval_idx:
+        elif idx in eval_idx:
             eval_f.write(line)
         else:
             train_f.write(line)
