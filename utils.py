@@ -9,9 +9,6 @@ import matplotlib
 matplotlib.use('pdf')
 import matplotlib.pyplot as plt
 
-
-
-
 def load_spectrogram(fpath):
     wav, sr = librosa.load(fpath, sr=args.sr)
 
@@ -133,5 +130,3 @@ def prepro_guided_attention(N, T, g=0.2):
             else:
                 W[tx, ty] = 1.0 - np.exp(-0.5 * ((N-1)/N - tx/N)**2 / (g/2)**2) # forcing more at end step
     return W
-
-

@@ -37,9 +37,9 @@ class ConfigArgs:
 
     batch_size = 32
     test_batch = 32 # for test
-    max_step = 100000
+    max_step = 200000
     lr = 0.001
-    lr_decay_step = 5000 # actually not decayed per this step
+    lr_decay_step = 50000 # actually not decayed per this step
     Ce = 128  # for text embedding and encoding
     Cx = 256 # for text embedding and encoding
     Cy = 256 # for audio encoding
