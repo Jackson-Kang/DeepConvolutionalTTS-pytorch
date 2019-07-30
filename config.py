@@ -36,7 +36,7 @@ class ConfigArgs:
     g = 0.2
 
     batch_size = 32
-    test_batch = 32 # for test
+    test_batch = 1 # for test
     max_step = 200000
     lr = 0.001
     lr_decay_step = 50000 # actually not decayed per this step
@@ -47,6 +47,6 @@ class ConfigArgs:
     drop_rate = 0.05
 
     max_Tx = 188
-    max_Ty = 250
+    max_Ty = 200
 
     vocab = u'''PE !',-.?abcdefghijklmnopqrstuvwxyz'''
