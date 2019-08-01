@@ -4,7 +4,7 @@ import torch.nn as nn
 from network import TextEncoder, AudioEncoder, AudioDecoder, DotProductAttention
 from torch.nn.utils import weight_norm as norm
 import module as mm
-
+import numpy as np
 import time as t
 
 class Text2Mel(nn.Module):
@@ -25,10 +25,7 @@ class Text2Mel(nn.Module):
         self.Attention = DotProductAttention()
         self.AudioDec = AudioDecoder()
         
-        self.mean_textenc_time = 0
-        self.mean_audioenc_time = 0
-        self.mean_audiodec_time = 0
-        self.mean_att_time = 0    
+        self.total_time = np.zeros(4, float)
 
 
     def forward(self, L, S, is_print=[False, False]):
@@ -47,37 +44,29 @@ class Text2Mel(nn.Module):
 
         if is_print[0] == True:
              text_enc_finish_time = t.time()
-             self.mean_textenc_time += (text_enc_finish_time - text_enc_start_time)
+             self.total_time[0] += (text_enc_finish_time - text_enc_start_time)
 
         Q = self.AudioEnc(S) # -> (N, Cx, Ty/r)
  
         if is_print[0]== True:
              audio_enc_finish_time = t.time() 
-             self.mean_audioenc_time += (audio_enc_finish_time - text_enc_finish_time)
+             self.total_time[1] += (audio_enc_finish_time - text_enc_finish_time)
 
         R, A = self.Attention(K, V, Q) # -> (N, Cx, Ty/r)
        
         if is_print[0] == True:
              att_finish_time = t.time()  
-             self.mean_att_time += (att_finish_time - audio_enc_finish_time)
+             self.total_time[2] += (att_finish_time - audio_enc_finish_time)
 
         R_ = torch.cat((R, Q), 1) # -> (N, Cx*2, Ty/r)
         Y = self.AudioDec(R_) # -> (N, n_mels, Ty/r)
 
         if is_print[0] == True:
              audio_dec_finish_time = t.time()
-             self.mean_audiodec_time += (audio_dec_finish_time - att_finish_time)
+             self.total_time[3] += (audio_dec_finish_time - att_finish_time)
 
 
-        if is_print[1] == True:
-             print("\n\t[Synthesis Result]")
-             print("\t\tMean TextEncoder Time: ", self.mean_textenc_time / args.max_Ty)
-             print("\t\tMean AudioEncoder Time: ", self.mean_audioenc_time / args.max_Ty)
-             print("\t\tMean Attention Time: ", self.mean_att_time / args.max_Ty)
-             print("\t\tMean AudioDecoder Time: ", self.mean_audiodec_time / args.max_Ty)
-
-
-        return Y.transpose(1, 2), A # (N, Ty/r, n_mels)
+        return Y.transpose(1, 2), A, self.total_time # (N, Ty/r, n_mels)
 
 class SSRN(nn.Module):
     """
