@@ -2,3 +2,5 @@
 __pycache__/
 logs
 runs
+records.txt
+mark.txt
