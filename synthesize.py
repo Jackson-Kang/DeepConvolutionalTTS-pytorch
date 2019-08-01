@@ -107,12 +107,10 @@ if __name__ == '__main__':
 
     print("possible threads:", torch.get_num_threads())
 
-    #device_list = ['cpu', 'gpu']
-    device_list = ['cpu']
-    thread_num_list = [16, 20]
-    #thread_num_list = [1, 2, 3, 4, 6, 8, 12, 16, 20, 30, 40]
+    device_list = ['cpu', 'gpu']
+    thread_num_list = [1, 2, 3, 4, 6, 8, 12, 16, 20, 30, 40]
     batch_size_list = [1, 32]
-    repeat_numb = 2
+    repeat_numb = 10
 
     gpu_id = int(sys.argv[1])
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
