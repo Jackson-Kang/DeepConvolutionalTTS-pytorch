@@ -4,3 +4,4 @@ logs
 runs
 records.txt
 mark.txt
+*.pyc
