@@ -98,7 +98,7 @@ def evaluate(model, data_loader, criterion, writer, global_step, batch_size=100)
                 first_frames = torch.zeros([mels.shape[0], 1, args.n_mels]).to(DEVICE) # (N, Ty/r, n_mels)
                 texts, mels = texts.to(DEVICE), mels.to(DEVICE)
                 prev_mels = torch.cat((first_frames, mels[:, :-1, :]), 1)
-                mels_hat, A = model(texts, prev_mels)  # mels_hat: (N, Ty/r, n_mels), A: (N, Tx, Ty/r)
+                mels_hat, A, _ = model(texts, prev_mels)  # mels_hat: (N, Ty/r, n_mels), A: (N, Tx, Ty/r)
                 loss = criterion(mels_hat, mels)
             elif model.name == 'SSRN':
                 texts, mels, mags = texts.to(DEVICE), mels.to(DEVICE), extras.to(DEVICE)
