@@ -36,7 +36,7 @@ def train(model, data_loader, valid_loader, optimizer, scheduler, batch_size=32,
                 else:
                     texts, mels = texts.to(DEVICE), mels.to(DEVICE)
                 prev_mels = torch.cat((first_frames, mels[:, :-1, :]), 1)
-                mels_hat, A = model(texts, prev_mels)  # mels_hat: (N, Ty/r, n_mels), A: (N, Tx, Ty/r)
+                mels_hat, A, _ = model(texts, prev_mels)  # mels_hat: (N, Ty/r, n_mels), A: (N, Tx, Ty/r)
                 if args.ga_mode:
                     l1_loss = l1_criterion(mels_hat, mels)
                     bd_loss = bd_criterion(mels_hat, mels)
