@@ -54,6 +54,7 @@ class SpeechDataset(Dataset):
     def __len__(self):
         return len(self.fpaths)
 
+
 def load_vocab():
     char2idx = {char: idx for idx, char in enumerate(args.vocab)}
     idx2char = {idx: char for idx, char in enumerate(args.vocab)}
@@ -199,6 +200,45 @@ class TextDataset(Dataset):
         return len(self.texts)
 
 
+
+def read_meta(path):
+    '''
+    If we use pandas instead of this function, it may not cover quotes.
+    Args:
+        path: metadata path
+    Returns:
+        fpaths, texts, norms
+    '''
+    char2idx, _ = load_vocab()
+    lines = codecs.open(path, 'r', 'utf-8').readlines()
+    fpaths, texts, norms = [], [], []
+    for line in lines:
+        fname, text, norm = line.strip().split('|')
+        fpath = fname + '.npy'
+        text = text_normalize(text).strip() + u'E'  # ␃: EOS
+        text = [char2idx[char] for char in text]
+        norm = text_normalize(norm).strip() + u'E'  # ␃: EOS
+        norm = [char2idx[char] for char in norm]
+        fpaths.append(fpath)
+        texts.append(text)
+        norms.append(norm)
+    return fpaths, texts, norms
+
+
+class SpeechDataset_MSE(Dataset):
+    def __init__(self, metapath):
+
+        self.fpaths, self.texts, _ = read_meta(metapath)
+
+    def __getitem__(self, idx):
+        text = torch.tensor(self.texts[idx], dtype=torch.long)
+        return text, self.fpaths
+
+    def __len__(self):
+        return len(self.texts)
+
+
+
 def read_text(path):
     '''
     If we use pandas instead of this function, it may not cover quotes.
@@ -234,4 +274,5 @@ def synth_collate_fn(data):
     for idx in range(len(texts)):
         text_end = text_lengths[idx]
         text_pads[idx, :text_end] = texts[idx]
+
     return text_pads, None, None

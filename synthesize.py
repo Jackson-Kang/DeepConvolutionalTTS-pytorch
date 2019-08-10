@@ -34,7 +34,7 @@ def synthesize(t2m, ssrn, data_loader, batch_size=100):
         total_mel_hats = torch.zeros([len(data_loader.dataset), args.max_Ty, args.n_mels]).to(DEVICE)
         mags = torch.zeros([len(data_loader.dataset), args.max_Ty*args.r, args.n_mags]).to(DEVICE)
         
-        for step, (texts, _, _) in enumerate(data_loader):
+        for step, (texts, mel, _) in enumerate(data_loader):
             texts = texts.to(DEVICE)
             prev_mel_hats = torch.zeros([len(texts), args.max_Ty, args.n_mels]).to(DEVICE)
 
@@ -46,11 +46,11 @@ def synthesize(t2m, ssrn, data_loader, batch_size=100):
                 mel_hats, A, result_tuple = t2m(texts, prev_mel_hats, is_test) # mel: (N, Ty/r, n_mels)
                 prev_mel_hats[:, t+1, :] = mel_hats[:, t, :]
             
-
             text2mel_finish_time = time.time()
             text2mel_total_time += (text2mel_finish_time - text2mel_start_time)
 
             total_mel_hats[step*batch_size:(step+1)*batch_size, :, :] = prev_mel_hats
+
             
             print('='*10, ' Alignment ', '='*10)
             #alignments = A.cpu().detach().numpy()
@@ -74,6 +74,7 @@ def synthesize(t2m, ssrn, data_loader, batch_size=100):
     return result
 
 def main():
+
     testset = TextDataset(args.testset)
     test_loader = DataLoader(dataset=testset, batch_size=args.test_batch, drop_last=False,
                              shuffle=False, collate_fn=synth_collate_fn, pin_memory=True)

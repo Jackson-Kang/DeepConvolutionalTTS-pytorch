@@ -28,6 +28,9 @@ def train(model, data_loader, valid_loader, optimizer, scheduler, batch_size=32,
     idx2char = load_vocab()[-1]
     while global_step < args.max_step:
         epoch_loss = 0
+        train_iter = iter(data_loader)
+        data = train_iter.next()
+        print(data[0].size(), data[1].size())
         for step, (texts, mels, extras) in tqdm(enumerate(data_loader), total=len(data_loader), unit='B', ncols=70, leave=False):
             optimizer.zero_grad()
             if model.name == 'Text2Mel':
@@ -149,6 +152,7 @@ def save_model(model, model_infos, optimizer, scheduler, val_loss, global_step, 
     return model_infos
 
 def main(network=1):
+    model  = None
     if network == 1:
         model = Text2Mel().to(DEVICE)
     elif network == 2:

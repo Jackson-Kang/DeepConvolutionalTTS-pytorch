@@ -1,6 +1,6 @@
 
 class ConfigArgs:
-    data_path = '/home/minsu/data/LJSpeech-1.1'
+    data_path = '/home/jihyun/datasets/LJSpeech-1.1/'
     mel_dir, mag_dir = 'd_mels', 'd_mags'
     ga_dir = 'guides' # guided attention
     meta = 'metadata.csv'
@@ -8,6 +8,7 @@ class ConfigArgs:
     meta_eval = 'meta-eval.csv'
     meta_test = 'meta-test.csv'
     testset = 'test_sents.txt'
+
     logdir = 'logs'
     sampledir = 'samples'
     prepro = True
@@ -37,6 +38,7 @@ class ConfigArgs:
 
     batch_size = 32
     test_batch = 1 # for test
+    mse_batch = 1
     max_step = 200000
     lr = 0.001
     lr_decay_step = 50000 # actually not decayed per this step
