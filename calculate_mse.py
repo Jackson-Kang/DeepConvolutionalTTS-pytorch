@@ -31,7 +31,7 @@ def calculate_MSE(t2m, ssrn, data_loader, batch_size=100):
             first_frames = torch.zeros([mels.shape[0], 1, args.n_mels]).to(DEVICE) # (N, Ty/r, n_mels)
             texts, mels = texts.to(DEVICE), mels.to(DEVICE)
             prev_mels = torch.cat((first_frames, mels[:, :-1, :]), 1)
-            mels_hat, A, _ = t2m(texts, prev_mels)  # mels_hat: (N, Ty/r, n_mels), A: (N, Tx, Ty/r)
+            mels_hat, A, _ = t2m(texts, prev_mels, 0)  # mels_hat: (N, Ty/r, n_mels), A: (N, Tx, Ty/r)
 
             mean_error = ((mels_hat - mels)**2).mean()
             mse += mean_error

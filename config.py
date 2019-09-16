@@ -19,6 +19,8 @@ class ConfigArgs:
     n_workers = 8
     n_gpu = 2
     global_step = 0
+    records_dir = 'records'
+ 
 
     sr = 22050 # sampling rate
     preemph = 0.97 # pre-emphasize

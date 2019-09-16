@@ -43,8 +43,9 @@ def synthesize(t2m, ssrn, data_loader, batch_size=100):
             for t in tqdm(range(args.max_Ty-1), unit='B', ncols=70):
                 if t == args.max_Ty - 2:
                     is_test[1] = True
-                mel_hats, A, result_tuple = t2m(texts, prev_mel_hats, is_test) # mel: (N, Ty/r, n_mels)
+                mel_hats, A, result_tuple = t2m(texts, prev_mel_hats, t, is_test) # mel: (N, Ty/r, n_mels)
                 prev_mel_hats[:, t+1, :] = mel_hats[:, t, :]
+		print(mel_hats.sum(), mel.sum())
             
             text2mel_finish_time = time.time()
             text2mel_total_time += (text2mel_finish_time - text2mel_start_time)
@@ -53,11 +54,11 @@ def synthesize(t2m, ssrn, data_loader, batch_size=100):
 
             
             print('='*10, ' Alignment ', '='*10)
-            #alignments = A.cpu().detach().numpy()
-            #visual_texts = texts.cpu().detach().numpy()
-            #for idx in range(len(alignments)):
-            #    text = [idx2char[ch] for ch in visual_texts[idx]]
-                #utils.plot_att(alignments[idx], text, args.global_step, path=os.path.join(args.sampledir, 'A'), name='{}.png'.format(idx))
+            alignments = A.cpu().detach().numpy()
+            visual_texts = texts.cpu().detach().numpy()
+            for idx in range(len(alignments)):
+                text = [idx2char[ch] for ch in visual_texts[idx]]
+                utils.plot_att(alignments[idx], text, args.global_step, path=os.path.join(args.sampledir, 'A'), name='{}.png'.format(idx))
             print('='*10, ' SSRN ', '='*10)
             # Mel --> Mag
             mags[step*batch_size:(step+1)*batch_size:, :, :] = \
@@ -109,15 +110,15 @@ if __name__ == '__main__':
     print("possible threads:", torch.get_num_threads())
 
     device_list = ['cpu', 'gpu']
-    thread_num_list = [1, 2, 3, 4, 6, 8, 12, 16, 20, 30, 40]
-    batch_size_list = [1, 32]
-    repeat_numb = 10
+    thread_num_list = [16]
+    batch_size_list = [1]
+    repeat_numb = 1
 
     gpu_id = int(sys.argv[1])
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = "{}".format(gpu_id)
 
-    f = open("./records.txt", "w")
+    f = open("./records/records.txt", "w")
 
     for device in device_list:
 

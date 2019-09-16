@@ -1,2 +1,2 @@
 Audio samples from "Towards End-to-End Prosody Transfer for Expressive Speech Synthesis with Tacotron" https://google.github.io/tacotron/publications/end_to_end_prosody_transfer/
-15. That one sailed RIGHT over my head.
+17. Which came first... the chicken or the egg? Did the universe have a beginning... and if so, what happened before then? Where did the universe come from... and where is it going?

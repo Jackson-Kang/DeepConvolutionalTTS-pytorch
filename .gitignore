@@ -2,8 +2,8 @@
 __pycache__/
 logs
 runs
-records.txt
 mark.txt
 *.pyc
 samples/
 A/
+records/

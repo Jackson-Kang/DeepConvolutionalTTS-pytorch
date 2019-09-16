@@ -30,7 +30,7 @@ def train(model, data_loader, valid_loader, optimizer, scheduler, batch_size=32,
         epoch_loss = 0
         train_iter = iter(data_loader)
         data = train_iter.next()
-        print(data[0].size(), data[1].size())
+
         for step, (texts, mels, extras) in tqdm(enumerate(data_loader), total=len(data_loader), unit='B', ncols=70, leave=False):
             optimizer.zero_grad()
             if model.name == 'Text2Mel':
@@ -39,7 +39,7 @@ def train(model, data_loader, valid_loader, optimizer, scheduler, batch_size=32,
                 else:
                     texts, mels = texts.to(DEVICE), mels.to(DEVICE)
                 prev_mels = torch.cat((first_frames, mels[:, :-1, :]), 1)
-                mels_hat, A, _ = model(texts, prev_mels)  # mels_hat: (N, Ty/r, n_mels), A: (N, Tx, Ty/r)
+                mels_hat, A, _ = model(texts, prev_mels, 0)  # mels_hat: (N, Ty/r, n_mels), A: (N, Tx, Ty/r)
                 if args.ga_mode:
                     l1_loss = l1_criterion(mels_hat, mels)
                     bd_loss = bd_criterion(mels_hat, mels)
@@ -101,7 +101,7 @@ def evaluate(model, data_loader, criterion, writer, global_step, batch_size=100)
                 first_frames = torch.zeros([mels.shape[0], 1, args.n_mels]).to(DEVICE) # (N, Ty/r, n_mels)
                 texts, mels = texts.to(DEVICE), mels.to(DEVICE)
                 prev_mels = torch.cat((first_frames, mels[:, :-1, :]), 1)
-                mels_hat, A, _ = model(texts, prev_mels)  # mels_hat: (N, Ty/r, n_mels), A: (N, Tx, Ty/r)
+                mels_hat, A, _ = model(texts, prev_mels, 0)  # mels_hat: (N, Ty/r, n_mels), A: (N, Tx, Ty/r)
                 loss = criterion(mels_hat, mels)
             elif model.name == 'SSRN':
                 texts, mels, mags = texts.to(DEVICE), mels.to(DEVICE), extras.to(DEVICE)
